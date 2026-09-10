@@ -1,4 +1,6 @@
-This repository contains my implementations for lab 1 of the SC2005 (Operating Systems) module under NTU. It includes some demonstrations of (1) how to imeplement custom system calls in xv6, and (2) how to utilize pipes for communication between forked processes.
+# Introduction
+
+This repository contains my implementations for lab 1 of the SC2005 (Operating Systems) module under NTU. It includes some demonstrations of (1) how to implement custom system calls in xv6, and (2) how to utilize pipes for communication between forked processes.
 
 ---
 Official NTU README.md Start
