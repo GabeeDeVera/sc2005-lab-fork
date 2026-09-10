@@ -4,3 +4,30 @@ ctrl+P result
 
 1 sleep init
 2 sleep sh
+
+Part 2:
+swtch swaps between scheduler CPU context and process register context
+there is an invariant that if a process is currently running, the CPU context is stored in CPU
+otherwise, if the scheduler is running, a process' register context is stored
+
+2.5:
+
+1 sleep  init
+2 sleep  sh
+3 sleep  starvetest
+4 run    starvetest
+5 runble starvetest
+
+1 sleep  init
+2 sleep  sh
+3 sleep  starvetest
+4 run    starvetest
+5 runble starvetest
+
+1 sleep  init
+2 sleep  sh
+3 sleep  starvetest
+4 run    starvetest
+5 runble starvetest
+
+strict-even-PID violates progress and bounded waiting
