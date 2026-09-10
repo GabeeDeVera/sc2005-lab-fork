@@ -1,3 +1,5 @@
+uint64 proccount();
+
 // Saved registers for kernel context switches.
 struct context {
   uint64 ra;
