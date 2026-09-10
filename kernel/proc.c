@@ -434,6 +434,71 @@ wait(uint64 addr)
   }
 }
 
+// FCFS Scheduler
+void
+scheduler(void)
+{
+  struct proc *p;
+  struct cpu *c = mycpu();
+
+  c->proc = 0;
+  for(;;){
+    // The most recent process to run may have had interrupts
+    // turned off; enable them to avoid a deadlock if all
+    // processes are waiting. Then turn them back off
+    // to avoid a possible race between an interrupt
+    // and wfi.
+    intr_on();
+    intr_off();
+
+    int found = 0;
+    int smallest_pid = NPROC;
+    struct proc* to_run;
+
+    // ! kinda worried that this may lead to deadlocks
+    // ! claude says no
+    
+    // ! REMEMBER: EXACTLY one lock must be held when a process is run
+    for(p = proc; p < &proc[NPROC]; p++) {
+      acquire(&p->lock);
+      if(p->state == RUNNABLE && p->pid < smallest_pid) {
+        // check whether the ctime (pid) of the current process is the smallest
+
+        // release the lock of the previous process, if found
+        if(found == 1) {
+            release(&to_run->lock);
+        }
+
+        // choose a new smallest process to run
+        smallest_pid = p->pid;
+        to_run = p;
+        found = 1;
+      } else {
+        // release lock immediately if the current proc will definitively not be chosen for execution
+        release(&p->lock);
+      }
+    }
+    if(found == 0) {
+      // nothing to run; stop running on this core until an interrupt.
+      asm volatile("wfi");
+    } else {
+        // ! No need to acquire the lock, as we have already acquired it previously
+
+        // Switch to chosen process.  It is the process's job
+        // to release its lock and then reacquire it
+        // before jumping back to us.
+        to_run->state = RUNNING;
+        c->proc = to_run;
+        swtch(&c->context, &to_run->context);
+
+        // Process is done running for now.
+        // It should have changed its p->state before coming back.
+        c->proc = 0;
+        release(&to_run->lock);
+    }
+  }
+}
+
 // Per-CPU process scheduler.
 // Each CPU calls scheduler() after setting itself up.
 // Scheduler never returns.  It loops, doing:
@@ -442,7 +507,7 @@ wait(uint64 addr)
 //  - eventually that process transfers control
 //    via swtch back to the scheduler.
 void
-scheduler(void)
+per_cpu_scheduler(void)
 {
   struct proc *p;
   struct cpu *c = mycpu();
