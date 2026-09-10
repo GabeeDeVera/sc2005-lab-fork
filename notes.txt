@@ -1,0 +1,6 @@
+Part 1:
+
+ctrl+P result
+
+1 sleep init
+2 sleep sh
